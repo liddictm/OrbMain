@@ -32,7 +32,7 @@ public class World {
 		camera     = new OrthographicCamera();
 		mainBatch  = new SpriteBatch();
 		physics    = new Physics(this.camera, this);
-		orbCreator = new OrbCreator(15, this);
+//		orbCreator = new OrbCreator(15, this);
 		
 		Gdx.input.setInputProcessor(new Input(this));
 		

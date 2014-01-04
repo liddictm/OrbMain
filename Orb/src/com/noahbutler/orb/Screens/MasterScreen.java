@@ -2,6 +2,12 @@ package com.noahbutler.orb.Screens;
 
 import com.badlogic.gdx.Screen;
 
+/*
+ * @author: Noah Butler
+ * 
+ * is extended by all other screens so we can keep them in arrays
+ */
+
 public class MasterScreen implements Screen{
 
 	@Override
