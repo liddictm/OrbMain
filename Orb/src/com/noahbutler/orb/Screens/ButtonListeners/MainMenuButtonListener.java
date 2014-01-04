@@ -19,11 +19,11 @@ public class MainMenuButtonListener extends InputListener{
 	
 	public boolean touchDown(InputEvent event, float x, float y, int pointer,
 			int button) {
-
+		game.setScreen(screen);
 		return true;
 	}
 	
 	public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-		game.setScreen(screen);
+		
 	}
 }
