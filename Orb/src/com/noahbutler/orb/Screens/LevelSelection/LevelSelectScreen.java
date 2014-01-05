@@ -1,11 +1,10 @@
 package com.noahbutler.orb.Screens.LevelSelection;
 
-import java.util.ArrayList;
-
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Array;
 import com.noahbutler.orb.OrbGame;
 import com.noahbutler.orb.Screens.MasterScreen;
 import com.noahbutler.orb.Screens.ButtonListeners.MainMenuButtonListener;
@@ -13,17 +12,16 @@ import com.noahbutler.orb.Screens.ButtonListeners.MainMenuButtonListener;
 public class LevelSelectScreen extends MasterScreen{
 	
 	OrbGame game;
-	TextureAtlas levelButtonAtlas;
 	
-	ArrayList<ImageButton> imageButtons;
-	ArrayList<ImageButtonStyle> imageButtonStyle;
-	ArrayList<Boolean> unlocked;
+	Array<ImageButton> imageButtons;
+	Array<ImageButtonStyle> imageButtonStyle;
+	Array<Boolean> unlocked;
 	
-	ArrayList<MasterScreen> levelScreens;
+	Array<MasterScreen> levelScreens;
 
 	private Skin skin;
 	
-	public LevelSelectScreen(OrbGame game, ArrayList<MasterScreen> levelScreens) {
+	public LevelSelectScreen(OrbGame game, Array<MasterScreen> levelScreens) {
 		this.game = game;
 		this.levelScreens = levelScreens;
 	}
@@ -43,19 +41,16 @@ public class LevelSelectScreen extends MasterScreen{
 	@Override
 	public void show() {
 		// TODO Auto-generated method stub
-		if(levelButtonAtlas == null) {
-			levelButtonAtlas = new TextureAtlas();
-		}
 		
 		if(skin == null){
 			skin = new Skin();
 			for(int i = 0; i < 3 * 2; i++) {
-				skin.add("levelGroup" + i, levelButtonAtlas.createSprite("levelGroup" + i));
+				skin.add("levelGroup" + i, getTextureAtlas().createSprite("levelGroup" + i));
 			}
 		}
 		
 		if(imageButtonStyle == null) {
-			imageButtonStyle = new ArrayList<ImageButtonStyle>();
+			imageButtonStyle = new Array<ImageButtonStyle>();
 			
 			for(int i = 0; i < 3; i++) {
 				imageButtonStyle.add(new ImageButtonStyle());
@@ -82,7 +77,7 @@ public class LevelSelectScreen extends MasterScreen{
 		}
 		
 		if(imageButtons == null) {
-			imageButtons = new ArrayList<ImageButton>();
+			imageButtons = new Array<ImageButton>();
 			
 			for(int i = 0; i < 3; i++) {
 				imageButtons.add(new ImageButton(imageButtonStyle.get(i)));
@@ -91,7 +86,7 @@ public class LevelSelectScreen extends MasterScreen{
 		}
 		
 		if(unlocked == null) {
-			unlocked = new ArrayList<Boolean>();
+			unlocked = new Array<Boolean>();
 		}
 	}
 
@@ -121,6 +116,11 @@ public class LevelSelectScreen extends MasterScreen{
 		
 		//save booleans
 		
+	}
+	
+	private TextureAtlas getTextureAtlas() {
+		return null;
+//		return game.getAssetLoader().mainManager.getAssetFileName(levelSelectionGraphics);//not set yet
 	}
 	
 

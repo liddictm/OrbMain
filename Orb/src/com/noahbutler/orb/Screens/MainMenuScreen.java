@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Array;
 import com.noahbutler.orb.OrbGame;
 import com.noahbutler.orb.Screens.ButtonListeners.MainMenuButtonListener;
 
@@ -21,10 +22,10 @@ public class MainMenuScreen extends MasterScreen{
 	
 	//might make one big texture atlas
 	private TextureAtlas menuButtons;
-	private ArrayList<ImageButton> imageButtons;
-	private ArrayList<ImageButtonStyle> imageButtonsStyle;
+	private Array<ImageButton> imageButtons;
+	private Array<ImageButtonStyle> imageButtonsStyle;
 	private Skin skin;
-	private ArrayList<MasterScreen> screens;
+	private Array<MasterScreen> screens;
 	
 	private Texture background;
 
@@ -34,7 +35,7 @@ public class MainMenuScreen extends MasterScreen{
 	
 	String log = "MM";
 
-	public MainMenuScreen(OrbGame game, ArrayList<MasterScreen> screens) {
+	public MainMenuScreen(OrbGame game, Array<MasterScreen> screens) {
 		this.game = game;
 		this.screens = screens;
 		
@@ -83,7 +84,7 @@ public class MainMenuScreen extends MasterScreen{
 
 		
 		if(imageButtonsStyle == null) {
-			imageButtonsStyle = new ArrayList<ImageButtonStyle>();
+			imageButtonsStyle = new Array<ImageButtonStyle>();
 		}
 		
 		//make image button styles
@@ -116,7 +117,7 @@ public class MainMenuScreen extends MasterScreen{
 		
 		
 		if(imageButtons == null) {
-			imageButtons = new ArrayList<ImageButton>();
+			imageButtons = new Array<ImageButton>();
 		}
 		
 		//add styles and listeners to buttons

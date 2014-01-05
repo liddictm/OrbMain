@@ -3,6 +3,7 @@ package com.noahbutler.orb;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.utils.Array;
 import com.noahbutler.orb.Screens.AchievementScreen;
 import com.noahbutler.orb.Screens.GunUpgradeScreen;
 import com.noahbutler.orb.Screens.MainMenuScreen;
@@ -32,14 +33,15 @@ public class OrbGame extends Game {
 	private ShipUpgradeScreen shipUpgradeScreen;
 	private GunUpgradeScreen gunUpgradeScreen;
 	
-	private ArrayList<MasterScreen> screens;
-	private ArrayList<MasterScreen> levelScreens;
+	private Array<MasterScreen> screens;
+	private Array<MasterScreen> levelScreens;
 	
+	private MainAssetLoader assetLoader;
 	
 	@Override
 	public void create() {
-		screens      = new ArrayList<MasterScreen>();
-		levelScreens = new ArrayList<MasterScreen>();
+		screens      = new Array<MasterScreen>();
+		levelScreens = new Array<MasterScreen>();
 		
 		gameScreen = new OrbGameScreen();
 		
@@ -66,6 +68,11 @@ public class OrbGame extends Game {
 		levelSelectScreen = new LevelSelectScreen(this, levelScreens);
 		mainMenuScreen = new MainMenuScreen(this, screens);
 		
+		assetLoader = new MainAssetLoader();
+		
+		//set screen for testing for now, this
+		//will get changed to loading screen
+		//when the game is done.
 		setScreen(gameScreen);
 	}
 
@@ -89,5 +96,9 @@ public class OrbGame extends Game {
 
 	@Override
 	public void resume() {
+	}
+	
+	public MainAssetLoader getAssetLoader() {
+		return this.assetLoader;
 	}
 }

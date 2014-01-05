@@ -16,7 +16,6 @@ public class Orbs {
 	
 	public Orbs(int type) {
 		this.type = type;
-		canBeDeleted = false;
 	}
 	
 	public void render(SpriteBatch b, Sprite orb) {

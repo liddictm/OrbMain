@@ -235,13 +235,12 @@ public class Physics {
 							
 							//delete both bodies
 							bulletBodyDeletable.add(fixtureA.getBody());
-							bulletBodies.removeValue(fixtureA.getBody(), true);
 							
 							orbBodyDeletable.add(fixtureB.getBody());
 							orbBodies.removeValue(fixtureB.getBody(), true);
 							
 							//switch sprite to death animation
-							gameWorld.getOrbsObjectList().get(i).canBeDeleted(true);
+							gameWorld.orbs.get(i).canBeDeleted(true);
 						}
 					}
 				}else{

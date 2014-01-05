@@ -12,10 +12,21 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.noahbutler.orb.World.Input.Input;
+import com.noahbutler.orb.World.Orbs.EndlessOrbCreator;
 import com.noahbutler.orb.World.Orbs.OrbCreator;
+import com.noahbutler.orb.World.Orbs.OrbRenderer;
 import com.noahbutler.orb.World.Orbs.Orbs;
 import com.noahbutler.orb.World.Ship.Bullet;
 import com.noahbutler.orb.World.Ship.MainShip;
+
+/**
+ * 
+ * @author Noah Butler
+ * 
+ * Main class that brings all the
+ * elements of the game together
+ *
+ */
 
 public class World {
 	
@@ -25,25 +36,42 @@ public class World {
 	OrthographicCamera camera;
 	Physics physics;
 	
-	OrbCreator orbCreator;
-	MainShip ship;
 	
-	public World() {
+	MainShip ship;
+	private OrbCreator orbCreator;
+	private EndlessOrbCreator endlessOrbCreator;
+	private OrbRenderer orbRenderer;
+	public Array<Orbs> orbs;
+	
+	/**
+	 * 
+	 * @param endless
+	 * 
+	 */
+	public World(boolean endless) {
 		camera     = new OrthographicCamera();
 		mainBatch  = new SpriteBatch();
 		physics    = new Physics(this.camera, this);
-//		orbCreator = new OrbCreator(15, this); //not currently working.
 		
 		Gdx.input.setInputProcessor(new Input(this));
 		
 //		ship = new MainShip();
 		
+		orbRenderer = new OrbRenderer();
+		orbs        = new Array<Orbs>();
+		
+		if(endless) {
+			endlessOrbCreator = new EndlessOrbCreator(this);
+		}else{
+//			orbCreator = new OrbCreator(15, this); //not currently working. Because of the use of Random
+		}
 	}
 	
 	public void render() {
+		endlessOrbCreator.create();
 		physics.step();
 		mainBatch.begin();
-		
+//		orbRenderer.render(mainBatch, orbs);
 //		orbCreator.render(mainBatch);
 		mainBatch.end();
 		camera.update();
@@ -71,26 +99,23 @@ public class World {
 		return physics.bulletBodies;
 	}
 	
-	//gets used in physics class
-	public Array<Orbs> getOrbsObjectList() {
-		return orbCreator.getOrbsObjectList();
-	}
-	
-	//gets used in orb creator class
-	public Array<Body> getOrbBodyList() {
-		return physics.orbBodies;
-	}
-	
+	//gets used in OrbCreator
 	public void addOrbToPhysicsWorld(Vector2 position) {
 		physics.addOrb(position);
 	}
 	
+	//get Used in Input
 	public void addBulletToPhysicsBullet(Vector2 position) {
 		physics.addBullet(position);
 	}
 	
+	//gets Used as the bullet's position in Input
 	public Vector2 getShipPosition() {
 		return physics.getShipPosition();
+	}
+	
+	public void addOrbForRendering(int type) {
+		orbs.add(new Orbs(type));
 	}
 
 }

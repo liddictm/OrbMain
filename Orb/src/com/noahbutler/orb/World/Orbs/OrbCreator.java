@@ -12,8 +12,17 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.noahbutler.orb.World.World;
 
+/**
+ * 
+ * @author Noah Butler
+ * 
+ * probably will get rewritten soon
+ *
+ */
+
 public class OrbCreator {
 	
+	//this is why it doesn't work
 	private Random gen;
 	
 	TextureAtlas orbs;
@@ -131,22 +140,4 @@ public class OrbCreator {
 
 		Gdx.app.log("ORBS", "" + numbOfOrbs);
 	}
-	
-	public void render(SpriteBatch b) {
-		//render orbs in the group of orbs
-//		for(int i = 0; i < numbOfOrbs; i++) {
-//			if(orbsList.get(i).getType() == WHITE_INT){
-//				orbsList.get(i).render(b, whiteOrb);
-//			}
-//			//if orb dies, remove from group
-//			if(orbsList.get(i).canBeDeleted()){
-//				orbsList.removeIndex(i);
-//			}
-//		}
-	}
-	
-	public Array<Orbs> getOrbsObjectList() {
-		return orbsList;
-	}
-
 }
