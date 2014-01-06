@@ -12,7 +12,7 @@ public class OrbGameScreen extends MasterScreen{
 	public void render(float delta) {
 		// TODO Auto-generated method stub
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-		world.render();
+		world.render(delta);
 	}
 
 	@Override

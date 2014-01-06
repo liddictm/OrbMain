@@ -67,9 +67,9 @@ public class World {
 		}
 	}
 	
-	public void render() {
+	public void render(float delta) {
 		endlessOrbCreator.create();
-		physics.step();
+		physics.step(delta);
 		mainBatch.begin();
 //		orbRenderer.render(mainBatch, orbs);
 //		orbCreator.render(mainBatch);

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -13,29 +12,28 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.JointEdge;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
-import com.noahbutler.orb.World.Orbs.Orbs;
-import com.noahbutler.orb.World.Ship.Bullet;
 
 public class Physics {
 	
+	private static final float BOX_STEP = 1/60f;
+	private static final int  BOX_VELOCITY_ITERATIONS = 6;
+	private static final int BOX_POSITION_ITERATIONS = 2;
+	private float accumulator;
+
 	public World world;
 	private Box2DDebugRenderer debug;
 	private OrthographicCamera camera;
 	private static final float SCALING_FACTOR = .05f;
 	
-	private Array<Fixture> orbFixtures;
-	private Array<Fixture> bulletFixtures;
-	private Array<Orbs> orbObjectList;
-	private Array<Bullet> bulletObjectList;
-	
 	public Array<Body> bulletBodies;
 	public Array<Body> orbBodies;
+	public Array<Body> bounds;
 	
 	private Array<Body> bulletBodyDeletable;
 	private Array<Body> orbBodyDeletable;
@@ -54,29 +52,34 @@ public class Physics {
         world           = new World(gravity, true);
         debug           = new Box2DDebugRenderer();
         
-        orbFixtures    = new Array<Fixture>(); //dont really need these, instead use fixtureA.getBody()
-        bulletFixtures = new Array<Fixture>(); // and compare the bodies instead of the fixtures
         bulletBodies   = new Array<Body>();
         orbBodies      = new Array<Body>();
+        bounds         = new Array<Body>();
         
         bulletBodyDeletable = new Array<Body>();
         orbBodyDeletable    = new Array<Body>();
         
         createCollisionListener();
-        addTestGround(new Vector2(0, -32), 18, 1);
-        addTestGround(new Vector2(0, 32), 18, 1);
-        addTestGround(new Vector2(-18 , 0), 1, 32);
-        addTestGround(new Vector2(18, 0), 1, 32);
+        addBounds(new Vector2(0, -35), 20, 1);
+        addBounds(new Vector2(0, 35), 20, 1);
+        addBounds(new Vector2(-20 , 0), 1, 35);
+        addBounds(new Vector2(20, 0), 1, 35);
         addShip();
     }
 	
-	public void step() {
+	public void step(float delta) {
 		float xAccel = -Gdx.input.getAccelerometerX(); //get the x position of the accelerometer
 		shipBody.setLinearVelocity(xAccel * 10.0f, 0); //set a velocity for the ship body a according to the position of the accelerometer
-		
-		//step
-		world.step(Gdx.graphics.getDeltaTime(), 8, 3);
-		
+		//update object
+		updateObjects();
+		//step and body deletion
+		accumulator += delta;
+		while(accumulator > BOX_STEP) {
+			world.step(BOX_STEP, BOX_VELOCITY_ITERATIONS, BOX_POSITION_ITERATIONS);
+			accumulator -= BOX_STEP;
+		}
+		//safe to remove
+		removeDeadBodies();
 		//so I can see the bodies
 		debug.render(world, camera.combined);
 	}
@@ -85,7 +88,7 @@ public class Physics {
 
 		//make the shape of the body of fixture could be made in constructor, same for every orb
 		PolygonShape orbShape = new PolygonShape();
-		orbShape.setAsBox(1, 1);
+		orbShape.setAsBox(1.5f, 1.5f);
 		
 		//make a body to add to the world, could use the same object each time
 		BodyDef orbBodyDef = new BodyDef();
@@ -102,12 +105,14 @@ public class Physics {
 		//add fixture to the world body
 		orbBody.createFixture(orbFixture);
 		
-		//add fixture for collision detection
-		for(Fixture fixture: orbBody.getFixtureList()) {
-			orbFixtures.add(fixture);
-		}
-		//add body to list for position updating
+		//add body to list for position updating and collision detection
 		orbBodies.add(orbBody);
+		
+		//add speed
+		orbBody.setLinearVelocity(0, -8.0f);
+		
+		//dispose uneeded shape
+		orbShape.dispose();
 	}
 	
 	public void addBullet(Vector2 position) {
@@ -128,18 +133,13 @@ public class Physics {
 		FixtureDef bulletFixture = new FixtureDef();
 		bulletFixture.shape = bulletShape;
 		
-		//add fixture to the world body
+		//add fixture to the world body 
 		bulletBody.createFixture(bulletFixture);
-		
-		//add fixtures for collision detection
-		for(Fixture fixture: bulletBody.getFixtureList()) {
-			bulletFixtures.add(fixture);
-		}
 		
 		//add speed
 		bulletBody.setLinearVelocity(0.0f, 30.0f);
 		
-		//add body to list for position updating
+		//add body to list for position updating and collision detection
 		bulletBodies.add(bulletBody);
 	}
 	
@@ -169,7 +169,7 @@ public class Physics {
 				
 	}
 	
-	private void addTestGround(Vector2 position, float xSize, float ySize) {
+	private void addBounds(Vector2 position, float xSize, float ySize) {
 		PolygonShape groundShape = new PolygonShape();
         groundShape.setAsBox(xSize, ySize);
         BodyDef groundBodyDef = new BodyDef();
@@ -179,10 +179,7 @@ public class Physics {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = groundShape;
         groundBody.createFixture(fixtureDef);
-        
-        for(Fixture fixture: groundBody.getFixtureList()) {
-        	bulletFixtures.add(fixture);
-        }
+        bounds.add(groundBody);
         groundShape.dispose();
 	}
 	
@@ -202,58 +199,45 @@ public class Physics {
 			@Override
 			public void endContact(Contact contact) {
 				// TODO Auto-generated method stub
-				Fixture fixtureA = contact.getFixtureA();
-				Fixture fixtureB = contact.getFixtureB();
-				
-				Gdx.app.log("Contact", fixtureA.toString() + " has stopped making contact with " + fixtureB.toString());
 			}
 			
 			@Override
 			public void beginContact(Contact contact) {
 				// TODO Auto-generated method stub
 				
-				boolean bulletIsFixtureA = false;
+				boolean bulletIsBodyA = false;
 
-				Fixture fixtureA = contact.getFixtureA();
-				Fixture fixtureB = contact.getFixtureB();
-				
-				for(int i = 0; i < bulletFixtures.size; i++) {
-					if(fixtureA.equals(bulletFixtures.get(i))) {
-						//bullet fixture is fixtureA
-						bulletIsFixtureA = true;
-					}else if(fixtureB.equals(bulletFixtures.get(i))) {
-						//bullet fixture is fixtureB
-						bulletIsFixtureA = false;
-					}
-				}
-				
-				if(bulletIsFixtureA) {
-					for(int i = 0; i < orbFixtures.size; i++) {
-						if(fixtureB.equals(orbFixtures.get(i))) {
-							//bullet is fixture a and orb is fixture b
-							Gdx.app.log("Contact", "bullet is A and orb is B");
-							
-							//delete both bodies
-							bulletBodyDeletable.add(fixtureA.getBody());
-							
-							orbBodyDeletable.add(fixtureB.getBody());
-							orbBodies.removeValue(fixtureB.getBody(), true);
-							
-							//switch sprite to death animation
-							gameWorld.orbs.get(i).canBeDeleted(true);
-						}
-					}
-				}else{
-					for(int i = 0; i < orbFixtures.size; i++) {
-						if(fixtureA.equals(orbFixtures.get(i))) {
-							//bullet is fixture b and orb is fixture a
-						}
-					}
-				}
+				Body bodyA = contact.getFixtureA().getBody();
+				Body bodyB = contact.getFixtureB().getBody();
 				
 				Gdx.app.log("Contact", "fixtureA has made contact with fixtureB");
 			}
 		});
+	}
+	
+	private void removeDeadBodies() {
+		for(int i = 0; i < bulletBodyDeletable.size; i++) {
+			Body body = bulletBodyDeletable.get(i);
+			if(!world.isLocked() && body != null) {
+				removeBodySafely(body);
+				bulletBodyDeletable.removeIndex(i);
+			}
+		}
+	}
+	
+	private void removeBodySafely(Body body) {
+		final ArrayList<JointEdge> list = body.getJointList();
+		while(list.size() > 0) {
+			world.destroyJoint(list.get(0).joint);
+		}
+		
+		world.destroyBody(body);
+	}
+	
+	private void updateObjects() {
+		//bodies are the parents
+		//update the objects with the bodies vector2
+		
 	}
 	
 	public void resize(int width, int height) {
