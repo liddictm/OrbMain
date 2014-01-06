@@ -18,6 +18,8 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.noahbutler.orb.World.Orbs.Orbs;
+import com.noahbutler.orb.World.Ship.Bullet;
 
 public class Physics {
 	
@@ -35,8 +37,7 @@ public class Physics {
 	public Array<Body> orbBodies;
 	public Array<Body> bounds;
 	
-	private Array<Body> bulletBodyDeletable;
-	private Array<Body> orbBodyDeletable;
+	private Array<Body> deletableBodies;
 	private com.noahbutler.orb.World.World gameWorld;
 	
 	private Body shipBody;
@@ -56,8 +57,7 @@ public class Physics {
         orbBodies      = new Array<Body>();
         bounds         = new Array<Body>();
         
-        bulletBodyDeletable = new Array<Body>();
-        orbBodyDeletable    = new Array<Body>();
+        deletableBodies = new Array<Body>();
         
         createCollisionListener();
         addBounds(new Vector2(0, -35), 20, 1);
@@ -84,7 +84,7 @@ public class Physics {
 		debug.render(world, camera.combined);
 	}
 	
-	public void addOrb(Vector2 position) {
+	public void addOrb(Vector2 position, Orbs orb) {
 
 		//make the shape of the body of fixture could be made in constructor, same for every orb
 		PolygonShape orbShape = new PolygonShape();
@@ -113,9 +113,12 @@ public class Physics {
 		
 		//dispose uneeded shape
 		orbShape.dispose();
+		
+		//add user data
+		orbBody.setUserData(orb);
 	}
 	
-	public void addBullet(Vector2 position) {
+	public void addBullet(Vector2 position, Bullet bullet) {
 		
 		//make the shape of the body of fixture could be made in constructor, same for every bullet
 		PolygonShape bulletShape = new PolygonShape();
@@ -139,8 +142,14 @@ public class Physics {
 		//add speed
 		bulletBody.setLinearVelocity(0.0f, 30.0f);
 		
+		//add body's userdata
+		bulletBody.setUserData(bullet);
+		
 		//add body to list for position updating and collision detection
 		bulletBodies.add(bulletBody);
+		
+		//delete uneeded shape
+		bulletShape.dispose();
 	}
 	
 	public void addShip() {
@@ -204,11 +213,29 @@ public class Physics {
 			@Override
 			public void beginContact(Contact contact) {
 				// TODO Auto-generated method stub
-				
-				boolean bulletIsBodyA = false;
 
 				Body bodyA = contact.getFixtureA().getBody();
 				Body bodyB = contact.getFixtureB().getBody();
+				Entity eA = (Entity) bodyA.getUserData();
+				Entity eB = (Entity) bodyB.getUserData();
+				
+				//bodyA might be an orb and bodyB might be a bullet
+				eA.startContact(eB.getIsBullet());
+				
+				//bodyB might be an orb and bodyA might be a bullet
+				eB.startContact(eA.getIsBullet());
+				
+				//might bodyA is a bullet or an orb
+				if(eA.getCheckDeletable() == "yes") {
+					//bodyA is a bullet or an orb
+					deletableBodies.add(bodyA);
+				}
+				
+				//might bodyB is a bullet or an orb
+				if(eB.getCheckDeletable() == "yes") {
+					//bodyB is a bullet or an orb
+					deletableBodies.add(bodyB);
+				}
 				
 				Gdx.app.log("Contact", "fixtureA has made contact with fixtureB");
 			}
@@ -216,11 +243,11 @@ public class Physics {
 	}
 	
 	private void removeDeadBodies() {
-		for(int i = 0; i < bulletBodyDeletable.size; i++) {
-			Body body = bulletBodyDeletable.get(i);
+		for(int i = 0; i < deletableBodies.size; i++) {
+			Body body = deletableBodies.get(i);
 			if(!world.isLocked() && body != null) {
 				removeBodySafely(body);
-				bulletBodyDeletable.removeIndex(i);
+				deletableBodies.removeIndex(i);
 			}
 		}
 	}

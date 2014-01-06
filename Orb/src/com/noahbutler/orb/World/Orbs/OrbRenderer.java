@@ -6,8 +6,7 @@ import com.badlogic.gdx.utils.Array;
 
 /**
  * 
- * @author Noah Butler 
- * 		   I made this class so that the orb creation is seperated
+ * @author Noah Butler I made this class so that the orb creation is seperated
  *         from rendering them. This is because there are to different was to
  *         add orbs but one way to render them.
  * 
@@ -18,21 +17,15 @@ import com.badlogic.gdx.utils.Array;
 
 public class OrbRenderer {
 
-	private static final int WHITE = 1;
-	private Array<Sprite> sprites;
-
 	public OrbRenderer() {
-		sprites = new Array<Sprite>();
-		sprites.add(new Sprite());
-		sprites.add(new Sprite());
+
 	}
 
 	public void render(SpriteBatch b, Array<Orbs> orbs) {
-		for (Orbs orb : orbs) {
-			if (orb.getType() == WHITE) { //add can be deleted
-				orb.render(b, sprites.get(WHITE));
+		if (orbs != null) {
+			for (Orbs orb : orbs) {
+				orb.render(b);
 			}
 		}
 	}
-
 }

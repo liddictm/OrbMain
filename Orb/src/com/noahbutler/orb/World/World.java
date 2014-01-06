@@ -100,13 +100,13 @@ public class World {
 	}
 	
 	//gets used in OrbCreator
-	public void addOrbToPhysicsWorld(Vector2 position) {
-		physics.addOrb(position);
+	public void addOrbToPhysicsWorld(Vector2 position, Orbs orb) {
+		physics.addOrb(position, orb);
 	}
 	
 	//get Used in Input
-	public void addBulletToPhysicsBullet(Vector2 position) {
-		physics.addBullet(position);
+	public void addBulletToPhysicsBullet(Vector2 position, Bullet bullet) {
+		physics.addBullet(position, bullet);
 	}
 	
 	//gets Used as the bullet's position in Input
@@ -114,8 +114,8 @@ public class World {
 		return physics.getShipPosition();
 	}
 	
-	public void addOrbForRendering(int type) {
-		orbs.add(new Orbs(type));
+	public void addOrbForRendering(Orbs orb) {
+		orbs.add(orb);
 	}
 
 }

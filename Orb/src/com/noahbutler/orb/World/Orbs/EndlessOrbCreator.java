@@ -65,7 +65,7 @@ public class EndlessOrbCreator {
 		// orb forging
 		if ((currentSpawnTime - lastSpawnTime) >= spawnInterval) {
 			// make orb
-			addOrbToPhysics();
+			addOrb();
 			// reset last spawn time
 			lastSpawnTime = currentSpawnTime;
 		} else {
@@ -91,8 +91,10 @@ public class EndlessOrbCreator {
 		return (spawnInterval / NANO) * .90;
 	}
 
-	private void addOrbToPhysics() {
+	private void addOrb() {
 		// random x coord, and static y coord
-		world.addOrbToPhysicsWorld(new Vector2(MathUtils.random(38) - 19, 30));
+		Orbs orb = new Orbs(1);
+		world.addOrbToPhysicsWorld(new Vector2(MathUtils.random(38) - 19, 30), orb);
+		world.addOrbForRendering(orb);
 	}
 }

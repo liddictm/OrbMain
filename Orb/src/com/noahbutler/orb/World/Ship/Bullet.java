@@ -2,18 +2,20 @@ package com.noahbutler.orb.World.Ship;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
+import com.noahbutler.orb.World.Entity;
 
-public class Bullet {
+public class Bullet extends Entity{
 	
-	int x;
-	int y;
+	private float x;
+	private float y;
 	
 	int dx;
 	int dy = 10;
 	
-	public Bullet(int x, int y) {
-		this.x = x;
-		this.y = y;
+	public Bullet(Vector2 vector) {
+		this.x = vector.x;
+		this.y = vector.y;
 	}
 	
 	public void render(SpriteBatch b, Sprite sprite) {
@@ -23,12 +25,30 @@ public class Bullet {
 		sprite.draw(b);
 	}
 	
-	public int getX() {
+	public float getX() {
 		return x;
 	}
 	
-	public int getY() {
+	public float getY() {
 		return y;
+	}
+	
+	
+	public void startContact(String isGround) {
+		
+	}
+	
+	public String getCheckDeletable() {
+		return "yes";
+	}
+	
+	public String getIsBullet(){
+		return "1";
+	}
+	
+	public void setPosition(Vector2 vector) {
+		this.x = vector.x;
+		this.y = vector.y;
 	}
 
 }
